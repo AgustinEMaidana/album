@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>⚽ FIFA Panini Manager 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#05111e;--bg2:#0b1d2e;--bg3:#122436;--card:#0f2035;--bdr:#1a3050;
+      --green:#00e676;--green2:#00c853;--gold:#ffc400;--red:#ff1744;--blue:#448aff;
+      --muted:#6b92b0;--text:#ddf0ff;--r:12px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;}
+    .hdr{position:sticky;top:0;z-index:90;background:linear-gradient(160deg,#021424,#0a1a2e);border-bottom:2px solid var(--green);padding:12px 16px 10px;box-shadow:0 2px 24px rgba(0,230,118,.12);}
+    .hdr-top{display:flex;align-items:center;justify-content:space-between;}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);text-shadow:0 0 18px rgba(255,196,0,.35);}
+    .logo em{color:var(--green);font-style:normal;}
+    .hdr-sub{font-size:11px;color:var(--muted);text-align:right;}
+    .prog-wrap{margin-top:9px;}
+    .prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+    .prog-bar{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:99px;transition:width .4s;}
+    .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--bdr);overflow-x:auto;scrollbar-width:none;}
+    .tabs::-webkit-scrollbar{display:none;}
+    .tab{flex:none;padding:11px 18px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;position:relative;}
+    .tab.active{color:var(--green);border-color:var(--green);}
+    .bdot{position:absolute;top:8px;right:8px;background:var(--red);color:#fff;border-radius:99px;padding:1px 5px;font-size:9px;font-weight:800;display:none;}
+    .bdot.show{display:inline-block;}
+    .main{padding:14px 14px 50px;max-width:560px;margin:0 auto;}
+    .view{display:none;}.view.active{display:block;}
+    .chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none;}
+    .chips::-webkit-scrollbar{display:none;}
+    .chip{flex:none;padding:5px 13px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--bdr);color:var(--muted);background:var(--bg2);white-space:nowrap;transition:all .18s;}
+    .chip.active,.chip:hover{border-color:var(--green);color:var(--green);background:rgba(0,230,118,.08);}
+    .chip-g{border-color:rgba(255,196,0,.3);color:var(--gold);}
+    .chip-g.active,.chip-g:hover{border-color:var(--gold);background:rgba(255,196,0,.1);color:var(--gold);}
+    .glabel{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--gold);background:rgba(255,196,0,.07);border:1px solid rgba(255,196,0,.2);border-radius:6px;padding:4px 10px;margin-bottom:8px;display:inline-block;}
+    .sec-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px;overflow:hidden;}
+    .sec-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;user-select:none;gap:8px;}
+    .sec-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sec-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .sec-badge{background:var(--bg3);border-radius:99px;padding:2px 9px;font-size:11px;font-weight:700;}
+    .sec-badge.done{background:rgba(0,230,118,.15);color:var(--green);}
+    .chev{font-size:11px;color:var(--muted);transition:transform .2s;}.chev.open{transform:rotate(180deg);}
+    .sec-bar{height:3px;background:var(--bg3);margin:0 14px;border-radius:99px;overflow:hidden;}
+    .sec-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .3s;}
+    .sec-actions{display:none;padding:8px 14px;gap:6px;flex-wrap:wrap;border-top:1px solid var(--bdr);}
+    .sec-actions.open{display:flex;}
+    .sa-btn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;border:1.5px solid var(--bdr);background:var(--bg3);color:var(--muted);transition:all .15s;}
+    .sa-btn:hover{border-color:var(--green);color:var(--green);}
+    .stk-grid{display:none;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px;padding:8px 14px 14px;}
+    .stk-grid.open{display:grid;}
+    .stk{aspect-ratio:1;border:2px solid var(--bdr);border-radius:7px;background:var(--bg3);color:var(--muted);font-size:10px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;position:relative;user-select:none;}
+    .stk.got{background:rgba(0,230,118,.1);border-color:var(--green);color:var(--green);}
+    .stk.got::after{content:'✓';position:absolute;top:-5px;right:-5px;background:var(--green);color:var(--bg);width:13px;height:13px;border-radius:50%;font-size:8px;display:flex;align-items:center;justify-content:center;}
+    .stk:active{transform:scale(.86);}
+    .stk.shield{border-color:rgba(255,196,0,.4);color:var(--gold);background:rgba(255,196,0,.06);font-size:14px;}
+    .stk.shield.got{background:rgba(255,196,0,.15);border-color:var(--gold);}
+    .stk.shield.got::after{background:var(--gold);}
+    .stk.fwc{border-color:rgba(68,138,255,.4);color:var(--blue);background:rgba(68,138,255,.07);font-size:9px;}
+    .stk.fwc.got{background:rgba(68,138,255,.18);border-color:var(--blue);}
+    .stk.fwc.got::after{background:var(--blue);}
+    .acct-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:13px 14px;margin-bottom:10px;}
+    .acct-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+    .acct-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;}
+    .btn{padding:9px 16px;border-radius:8px;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;cursor:pointer;border:none;transition:all .18s;}
+    .btn-green{background:var(--green);color:var(--bg);}.btn-green:hover{background:var(--green2);}
+    .btn-gold{background:var(--gold);color:var(--bg);}
+    .btn-ghost{background:transparent;border:1.5px solid var(--bdr);color:var(--muted);}.btn-ghost:hover{border-color:var(--red);color:var(--red);}
+    .btn-sm{padding:5px 11px;font-size:12px;}
+    .btn-blue{background:rgba(68,138,255,.12);border:1.5px solid var(--blue);color:var(--blue);border-radius:8px;padding:6px 12px;font-family:'Barlow',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .18s;white-space:nowrap;}
+    .btn-blue:hover{background:rgba(68,138,255,.25);}
+    .add-form{background:var(--card);border:1.5px dashed var(--bdr);border-radius:var(--r);padding:14px;display:flex;gap:8px;}
+    .inp{flex:1;background:var(--bg3);border:1.5px solid var(--bdr);border-radius:8px;padding:9px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+    .inp:focus{border-color:var(--green);}.inp::placeholder{color:var(--muted);}
+    .util-section{margin-bottom:20px;}
+    .util-head{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .util-cnt{background:rgba(255,196,0,.14);color:var(--gold);border-radius:99px;padding:2px 8px;font-size:11px;font-weight:700;}
+    .util-acct-bar{display:flex;gap:6px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bdr);flex-wrap:wrap;}
+    .util-row{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:10px;}
+    .util-left{display:flex;align-items:center;gap:10px;min-width:0;}
+    .util-num{background:var(--bg3);border:1.5px solid var(--bdr);border-radius:6px;padding:4px 8px;font-weight:800;font-size:12px;min-width:36px;text-align:center;flex-shrink:0;}
+    .util-info{min-width:0;}
+    .util-sec{font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .util-sub{font-size:11px;color:var(--muted);}
+    .empty{text-align:center;color:var(--muted);padding:40px 20px;}
+    .empty .ico{font-size:46px;margin-bottom:12px;}
+    .empty p{font-size:13px;margin-top:6px;}
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:flex-end;justify-content:center;}
+    .modal-bg.open{display:flex;}
+    .modal{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px 20px 0 0;border-bottom:none;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:18px 14px 32px;}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;}
+    .modal-close{background:var(--bg3);border:none;border-radius:50%;width:30px;height:30px;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .flex{display:flex;}.gap6{gap:6px;}.mb10{margin-bottom:10px;}
+  </style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="logo">FIFA <em>PANINI</em> 2026</div>
+    <div class="hdr-sub" id="hdrSub"></div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-labels"><span id="progTxt">Cargando…</span><span id="progPct">0%</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+</div>
+<div class="tabs">
+  <div class="tab active" data-tab="album">⚽ Mi Álbum</div>
+  <div class="tab" data-tab="secundarias">👥 Secundarias</div>
+  <div class="tab" data-tab="utiles">🔄 Útiles <span class="bdot" id="utilesDot"></span></div>
+</div>
+<div class="main">
+  <div id="view-album" class="view active">
+    <div class="chips" id="chips"></div>
+    <div id="albumContent"></div>
+  </div>
+  <div id="view-secundarias" class="view">
+    <div id="acctList"></div>
+    <div class="add-form">
+      <input class="inp" id="newAcct" placeholder="Nombre cuenta (ej: Hermano, Papá…)" maxlength="20">
+      <button class="btn btn-green" id="btnAddAcct">+ Agregar</button>
+    </div>
+  </div>
+  <div id="view-utiles" class="view">
+    <div id="utilesContent"></div>
+  </div>
+</div>
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalTitle">Cuenta</div>
+      <button class="modal-close" id="modalCloseBtn">✕</button>
+    </div>
+    <div id="modalInner"></div>
+  </div>
+</div>
+<script>
+// ═══════════════════════════════════════════
+// ⚙️  CONFIGURACIÓN DEL ÁLBUM
+// Total: 9 FWC + 48 equipos × 12 = 585
+// Cada equipo: posiciones 1-11 jugadores, 12 = escudo brillante
+// ═══════════════════════════════════════════
+const configuracionAlbum = {
+  "FWC":9,
+  "MEX":12,"RSA":12,"KOR":12,"CZE":12,
+  "CAN":12,"BIH":12,"QAT":12,"SUI":12,
+  "BRA":12,"MAR":12,"HAI":12,"SCO":12,
+  "USA":12,"PAR":12,"AUS":12,"TUR":12,
+  "GER":12,"CUW":12,"CIV":12,"ECU":12,
+  "NED":12,"JPN":12,"SWE":12,"TUN":12,
+  "BEL":12,"EGY":12,"IRN":12,"NZL":12,
+  "ESP":12,"CPV":12,"KSA":12,"URU":12,
+  "FRA":12,"SEN":12,"IRQ":12,"NOR":12,
+  "ARG":12,"ALG":12,"AUT":12,"JOR":12,
+  "POR":12,"COD":12,"UZB":12,"COL":12,
+  "ENG":12,"CRO":12,"GHA":12,"PAN":12
+};
+
+const INFO = {
+  "FWC": {nombre:"Especiales FWC",grupo:"FWC",emoji:"⭐"},
+  "MEX":{nombre:"México",grupo:"A",emoji:"🇲🇽"},
+  "RSA":{nombre:"Sudáfrica",grupo:"A",emoji:"🇿🇦"},
+  "KOR":{nombre:"Corea del Sur",grupo:"A",emoji:"🇰🇷"},
+  "CZE":{nombre:"Rep. Checa",grupo:"A",emoji:"🇨🇿"},
+  "CAN":{nombre:"Canadá",grupo:"B",emoji:"🇨🇦"},
+  "BIH":{nombre:"Bosnia y Herz.",grupo:"B",emoji:"🇧🇦"},
+  "QAT":{nombre:"Qatar",grupo:"B",emoji:"🇶🇦"},
+  "SUI":{nombre:"Suiza",grupo:"B",emoji:"🇨🇭"},
+  "BRA":{nombre:"Brasil",grupo:"C",emoji:"🇧🇷"},
+  "MAR":{nombre:"Marruecos",grupo:"C",emoji:"🇲🇦"},
+  "HAI":{nombre:"Haití",grupo:"C",emoji:"🇭🇹"},
+  "SCO":{nombre:"Escocia",grupo:"C",emoji:"🏴󠁧󠁢󠁳󠁣󠁴󠁿"},
+  "USA":{nombre:"Estados Unidos",grupo:"D",emoji:"🇺🇸"},
+  "PAR":{nombre:"Paraguay",grupo:"D",emoji:"🇵🇾"},
+  "AUS":{nombre:"Australia",grupo:"D",emoji:"🇦🇺"},
+  "TUR":{nombre:"Turquía",grupo:"D",emoji:"🇹🇷"},
+  "GER":{nombre:"Alemania",grupo:"E",emoji:"🇩🇪"},
+  "CUW":{nombre:"Curazao",grupo:"E",emoji:"🇨🇼"},
+  "CIV":{nombre:"Costa de Marfil",grupo:"E",emoji:"🇨🇮"},
+  "ECU":{nombre:"Ecuador",grupo:"E",emoji:"🇪🇨"},
+  "NED":{nombre:"Países Bajos",grupo:"F",emoji:"🇳🇱"},
+  "JPN":{nombre:"Japón",grupo:"F",emoji:"🇯🇵"},
+  "SWE":{nombre:"Suecia",grupo:"F",emoji:"🇸🇪"},
+  "TUN":{nombre:"Túnez",grupo:"F",emoji:"🇹🇳"},
+  "BEL":{nombre:"Bélgica",grupo:"G",emoji:"🇧🇪"},
+  "EGY":{nombre:"Egipto",grupo:"G",emoji:"🇪🇬"},
+  "IRN":{nombre:"Irán",grupo:"G",emoji:"🇮🇷"},
+  "NZL":{nombre:"Nueva Zelanda",grupo:"G",emoji:"🇳🇿"},
+  "ESP":{nombre:"España",grupo:"H",emoji:"🇪🇸"},
+  "CPV":{nombre:"Cabo Verde",grupo:"H",emoji:"🇨🇻"},
+  "KSA":{nombre:"Arabia Saudita",grupo:"H",emoji:"🇸🇦"},
+  "URU":{nombre:"Uruguay",grupo:"H",emoji:"🇺🇾"},
+  "FRA":{nombre:"Francia",grupo:"I",emoji:"🇫🇷"},
+  "SEN":{nombre:"Senegal",grupo:"I",emoji:"🇸🇳"},
+  "IRQ":{nombre:"Irak",grupo:"I",emoji:"🇮🇶"},
+  "NOR":{nombre:"Noruega",grupo:"I",emoji:"🇳🇴"},
+  "ARG":{nombre:"Argentina",grupo:"J",emoji:"🇦🇷"},
+  "ALG":{nombre:"Argelia",grupo:"J",emoji:"🇩🇿"},
+  "AUT":{nombre:"Austria",grupo:"J",emoji:"🇦🇹"},
+  "JOR":{nombre:"Jordania",grupo:"J",emoji:"🇯🇴"},
+  "POR":{nombre:"Portugal",grupo:"K",emoji:"🇵🇹"},
+  "COD":{nombre:"RD Congo",grupo:"K",emoji:"🇨🇩"},
+  "UZB":{nombre:"Uzbekistán",grupo:"K",emoji:"🇺🇿"},
+  "COL":{nombre:"Colombia",grupo:"K",emoji:"🇨🇴"},
+  "ENG":{nombre:"Inglaterra",grupo:"L",emoji:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+  "CRO":{nombre:"Croacia",grupo:"L",emoji:"🇭🇷"},
+  "GHA":{nombre:"Ghana",grupo:"L",emoji:"🇬🇭"},
+  "PAN":{nombre:"Panamá",grupo:"L",emoji:"🇵🇦"}
+};
+
+const GRUPOS = ["FWC","A","B","C","D","E","F","G","H","I","J","K","L"];
+const SK    = "fifa_panini_mgr_v4";
+const SECS  = Object.keys(configuracionAlbum);
+const TOTAL = Object.values(configuracionAlbum).reduce(function(a,b){return a+b;},0);
+
+function vacioEstado(){
+  var e={};
+  SECS.forEach(function(s){e[s]=new Array(configuracionAlbum[s]).fill(false);});
+  return e;
+}
+function migrar(est){
+  SECS.forEach(function(s){
+    if(!est[s]){est[s]=new Array(configuracionAlbum[s]).fill(false);return;}
+    var n=configuracionAlbum[s];
+    if(est[s].length<n) est[s]=est[s].concat(new Array(n-est[s].length).fill(false));
+  });
+  return est;
+}
+function cargar(){
+  try{
+    var raw=localStorage.getItem(SK);
+    if(!raw) return {principal:vacioEstado(),secundarias:[]};
+    var d=JSON.parse(raw);
+    if(!d.principal) d.principal=vacioEstado(); else migrar(d.principal);
+    if(!Array.isArray(d.secundarias)) d.secundarias=[];
+    d.secundarias.forEach(function(c){if(!c.figuritas) c.figuritas=vacioEstado(); else migrar(c.figuritas);});
+    return d;
+  }catch(e){return {principal:vacioEstado(),secundarias:[]};}
+}
+function guardar(){localStorage.setItem(SK,JSON.stringify(datos));}
+var datos=cargar();
+
+function countAll(est){return SECS.reduce(function(a,s){return a+est[s].filter(Boolean).length;},0);}
+function countSec(est,s){return est[s].filter(Boolean).length;}
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function sid(prefix,s){return prefix+"_"+s.replace(/[^a-zA-Z0-9]/g,"_");}
+function inf(s){return INFO[s]||{nombre:s,grupo:"?",emoji:"🏅"};}
+function secsGrupo(g){return SECS.filter(function(s){return inf(s).grupo===g;});}
+
+// ── PROGRESS ──
+function renderProgress(){
+  var got=countAll(datos.principal);
+  var pct=Math.round(got/TOTAL*100);
+  $("progTxt").textContent=got+" / "+TOTAL+" figuritas";
+  $("progPct").textContent=pct+"%";
+  $("progFill").style.width=pct+"%";
+  $("hdrSub").textContent=datos.secundarias.length+" cta"+(datos.secundarias.length!==1?"s":"")+" sec.";
+  var u=calcUtiles();
+  $("utilesDot").textContent=u>0?u:"";
+  $("utilesDot").classList.toggle("show",u>0);
+}
+function calcUtiles(){
+  var n=0;
+  datos.secundarias.forEach(function(c){
+    SECS.forEach(function(s){for(var i=0;i<configuracionAlbum[s];i++) if(!datos.principal[s][i]&&c.figuritas[s][i]) n++;});
+  });
+  return n;
+}
+
+// ── ÁLBUM ──
+var filtro=null, abierto={};
+
+function renderAlbum(){
+  var chipsHtml='<div class="chip '+(filtro===null?"active":"")+'\" data-filtro="">Todas</div>';
+  GRUPOS.forEach(function(g){
+    chipsHtml+='<div class="chip chip-g '+(filtro==="g:"+g?"active":"")+'\" data-filtro="g:'+g+'">'+(g==="FWC"?"⭐":"🏟️")+' Gr.'+g+'</div>';
+  });
+  SECS.forEach(function(s){
+    chipsHtml+='<div class="chip '+(filtro==="s:"+s?"active":"")+'\" data-filtro="s:'+s+'">'+inf(s).emoji+' '+s+'</div>';
+  });
+  $("chips").innerHTML=chipsHtml;
+
+  var grupos;
+  if(filtro===null) grupos=GRUPOS;
+  else if(filtro.startsWith("g:")) grupos=[filtro.slice(2)];
+  else grupos=null;
+
+  if(grupos){
+    $("albumContent").innerHTML=grupos.map(function(g){
+      var secs=secsGrupo(g); if(!secs.length) return "";
+      var label=g==="FWC"
+        ?'<div class="glabel">⭐ ESPECIALES FWC</div>'
+        :'<div class="glabel">🏟️ GRUPO '+g+'</div>';
+      return label+secs.map(function(s){return buildSecHtml(s,datos.principal,"P");}).join("");
+    }).join("");
+  } else {
+    var s=filtro.slice(2);
+    $("albumContent").innerHTML=buildSecHtml(s,datos.principal,"P");
+  }
+}
+
+function buildSecHtml(s,est,prefix){
+  var n=configuracionAlbum[s];
+  var got=countSec(est,s);
+  var pct=Math.round(got/n*100);
+  var ab=prefix==="P"?abierto[s]:modalOpen[s];
+  var id=sid(prefix,s);
+  var isFWC=(s==="FWC");
+  var stks=est[s].map(function(v,i){
+    var cls=isFWC?"fwc":(i===11?"shield":"");
+    var lbl=isFWC?("FWC-"+(i+1)):(i===11?"🛡️":(i+1));
+    return '<div class="stk '+cls+(v?" got":"")+'\" data-action="stk" data-s="'+s+'" data-i="'+i+'" data-prefix="'+prefix+'">'+lbl+"</div>";
+  }).join("");
+  var aKey=prefix==="P"?"marktodo":"mallsec";
+  var actions='<div class="sec-actions'+(ab?" open":"")+'\">'
+    +'<button class="sa-btn" data-action="'+aKey+'" data-s="'+s+'" data-val="1">✅ Marcar todo</button>'
+    +'<button class="sa-btn" data-action="'+aKey+'" data-s="'+s+'" data-val="0">❌ Desmarcar todo</button>'
+    +'</div>';
+  return '<div class="sec-card" id="'+id+'">'
+    +'<div class="sec-head" data-action="toggle" data-s="'+s+'" data-prefix="'+prefix+'">'
+    +'<div class="sec-title">'+inf(s).emoji+' '+esc(inf(s).nombre)+' <span style="font-size:11px;color:var(--muted);font-family:\'Barlow\',sans-serif;font-weight:600;letter-spacing:0">('+s+')</span></div>'
+    +'<div class="sec-right">'
+    +'<span class="sec-badge'+(got===n?" done":"")+'\" data-badge="'+id+'">'+got+"/"+n+'</span>'
+    +'<span class="chev'+(ab?" open":"")+'">▼</span>'
+    +'</div></div>'
+    +'<div class="sec-bar"><div class="sec-bar-fill" data-fill="'+id+'" style="width:'+pct+'%"></div></div>'
+    +actions
+    +'<div class="stk-grid'+(ab?" open":"")+'\" data-grid="'+id+'">'+stks+"</div>"
+    +"</div>";
+}
+
+function toggleSec(s,prefix){
+  if(prefix==="P"){
+    abierto[s]=!abierto[s];
+    var id=sid("P",s), card=document.getElementById(id); if(!card) return;
+    card.querySelector(".chev").classList.toggle("open",abierto[s]);
+    card.querySelector("[data-grid]").classList.toggle("open",abierto[s]);
+    card.querySelector(".sec-actions").classList.toggle("open",abierto[s]);
+  } else { modalOpen[s]=!modalOpen[s]; renderModal(); }
+}
+
+function toggleStk(s,i,prefix){
+  var est=prefix==="P"?datos.principal:datos.secundarias[modalAcctIdx].figuritas;
+  est[s][i]=!est[s][i]; guardar();
+  if(prefix==="P"){
+    var id=sid("P",s);
+    var btn=document.querySelector('[data-grid="'+id+'"] [data-s="'+s+'"][data-i="'+i+'"]');
+    if(btn) btn.classList.toggle("got",est[s][i]);
+    updateBadge(s,est,id); renderProgress();
+    if(tabActivo==="utiles") renderUtiles();
+  } else { renderModal(); renderSecundarias(); renderProgress(); if(tabActivo==="utiles") renderUtiles(); }
+}
+
+function marcarTodo(s,val){
+  datos.principal[s]=datos.principal[s].map(function(){return val;});
+  guardar();
+  var id=sid("P",s), grid=document.querySelector('[data-grid="'+id+'"]');
+  if(grid) grid.querySelectorAll(".stk").forEach(function(b){b.classList.toggle("got",val);});
+  updateBadge(s,datos.principal,id); renderProgress();
+  if(tabActivo==="utiles") renderUtiles();
+}
+
+function updateBadge(s,est,id){
+  var n=configuracionAlbum[s],got=countSec(est,s);
+  var badge=document.querySelector('[data-badge="'+id+'"]');
+  var fill=document.querySelector('[data-fill="'+id+'"]');
+  if(badge){badge.textContent=got+"/"+n;badge.classList.toggle("done",got===n);}
+  if(fill) fill.style.width=Math.round(got/n*100)+"%";
+}
+
+// ── SECUNDARIAS ──
+function renderSecundarias(){
+  var el=$("acctList");
+  if(!datos.secundarias.length){
+    el.innerHTML='<div class="empty"><div class="ico">👥</div>Aún no hay cuentas secundarias.<p>Agregalas abajo para ver figuritas útiles.</p></div>';
+    return;
+  }
+  el.innerHTML=datos.secundarias.map(function(c,i){
+    var got=countAll(c.figuritas),pct=Math.round(got/TOTAL*100);
+    return '<div class="acct-card">'
+      +'<div class="acct-head"><div class="acct-name">👤 '+esc(c.nombre)+'</div>'
+      +'<div class="flex gap6">'
+      +'<button class="btn btn-gold btn-sm" data-action="editacct" data-ci="'+i+'">✏️ Editar</button>'
+      +'<button class="btn btn-ghost btn-sm" data-action="delacct" data-ci="'+i+'">🗑️</button>'
+      +'</div></div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:7px">'+got+' / '+TOTAL+' figuritas · '+pct+'%</div>'
+      +'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>'
+      +'</div>';
+  }).join("");
+}
+function addAcct(){
+  var nom=$("newAcct").value.trim();
+  if(!nom){$("newAcct").focus();return;}
+  if(datos.secundarias.some(function(c){return c.nombre.toLowerCase()===nom.toLowerCase();})){alert("Ya existe esa cuenta.");return;}
+  datos.secundarias.push({nombre:nom,figuritas:vacioEstado()});
+  $("newAcct").value=""; guardar(); renderSecundarias(); renderProgress();
+}
+function eliminarAcct(idx){
+  if(!confirm('¿Eliminar la cuenta "'+datos.secundarias[idx].nombre+'"?')) return;
+  datos.secundarias.splice(idx,1); guardar(); renderSecundarias(); renderProgress();
+  if(tabActivo==="utiles") renderUtiles();
+}
+$("btnAddAcct").addEventListener("click",addAcct);
+$("newAcct").addEventListener("keydown",function(e){if(e.key==="Enter") addAcct();});
+
+// ── MODAL ──
+var modalAcctIdx=-1, modalFiltro=null, modalOpen={};
+function abrirModal(idx){
+  modalAcctIdx=idx; modalFiltro=null; modalOpen={};
+  $("modalTitle").textContent="👤 "+datos.secundarias[idx].nombre;
+  renderModal(); $("modalBg").classList.add("open");
+}
+function renderModal(){
+  var c=datos.secundarias[modalAcctIdx];
+  var chips='<div class="chips"><div class="chip '+(modalFiltro===null?"active":"")+'\" data-mfiltro="">Todas</div>';
+  GRUPOS.forEach(function(g){
+    chips+='<div class="chip chip-g '+(modalFiltro==="g:"+g?"active":"")+'\" data-mfiltro="g:'+g+'">'+(g==="FWC"?"⭐":"🏟️")+' Gr.'+g+'</div>';
+  });
+  SECS.forEach(function(s){
+    chips+='<div class="chip '+(modalFiltro===s?"active":"")+'\" data-mfiltro="'+s+'">'+inf(s).emoji+' '+s+'</div>';
+  });
+  chips+='</div>';
+  var globalBtns='<div class="flex gap6 mb10">'
+    +'<button class="btn btn-green btn-sm" data-action="mallacct" data-ci="'+modalAcctIdx+'" data-val="1">✅ Todo obtenido</button>'
+    +'<button class="btn btn-ghost btn-sm" data-action="mallacct" data-ci="'+modalAcctIdx+'" data-val="0">❌ Borrar todo</button>'
+    +'</div>';
+
+  var list;
+  if(modalFiltro===null) list=SECS;
+  else if(modalFiltro.startsWith("g:")) list=secsGrupo(modalFiltro.slice(2));
+  else list=[modalFiltro];
+
+  $("modalInner").innerHTML=chips+globalBtns+list.map(function(s){return buildSecHtml(s,c.figuritas,"M");}).join("");
+}
+function marcarTodoModal(s,val){
+  datos.secundarias[modalAcctIdx].figuritas[s]=datos.secundarias[modalAcctIdx].figuritas[s].map(function(){return val;});
+  guardar(); renderModal(); renderSecundarias(); renderProgress();
+  if(tabActivo==="utiles") renderUtiles();
+}
+function marcarTodoAcct(ci,val){
+  if(!confirm((val?"Marcar":"Desmarcar")+' TODAS las figuritas de "'+datos.secundarias[ci].nombre+'"?')) return;
+  SECS.forEach(function(s){datos.secundarias[ci].figuritas[s]=datos.secundarias[ci].figuritas[s].map(function(){return val;});});
+  guardar(); renderModal(); renderSecundarias(); renderProgress();
+  if(tabActivo==="utiles") renderUtiles();
+}
+function closeModal(){$("modalBg").classList.remove("open");modalAcctIdx=-1;modalFiltro=null;modalOpen={};}
+
+// ── ÚTILES ──
+function renderUtiles(){
+  var el=$("utilesContent");
+  if(!datos.secundarias.length){
+    el.innerHTML='<div class="empty"><div class="ico">🔄</div>No hay cuentas secundarias.<p>Creá una en "Secundarias" para ver qué figuritas te pueden pasar.</p></div>';
+    return;
+  }
+  var html="",algo=false;
+  datos.secundarias.forEach(function(c,ci){
+    var utiles=[];
+    SECS.forEach(function(s){for(var i=0;i<configuracionAlbum[s];i++) if(!datos.principal[s][i]&&c.figuritas[s][i]) utiles.push({s:s,i:i});});
+    if(!utiles.length) return;
+    algo=true;
+    html+='<div class="util-section">'
+      +'<div class="util-head">👤 '+esc(c.nombre)+' <span class="util-cnt">'+utiles.length+' útil'+(utiles.length!==1?"es":"")+'</span></div>'
+      +'<div class="util-acct-bar"><button class="btn btn-green btn-sm" data-action="recibirtodo" data-ci="'+ci+'">⬇️ Recibir todas ('+utiles.length+')</button></div>';
+    utiles.forEach(function(u){
+      var lbl=u.s==="FWC"?("FWC-"+(u.i+1)):(u.i===11?"🛡️":(u.i+1));
+      var sub=u.s==="FWC"?"Cromo especial":u.i===11?"Escudo brillante":"Jugador #"+(u.i+1);
+      html+='<div class="util-row">'
+        +'<div class="util-left">'
+        +'<div class="util-num">'+lbl+'</div>'
+        +'<div class="util-info">'
+        +'<div class="util-sec">'+inf(u.s).emoji+' '+esc(inf(u.s).nombre)+' <span style="color:var(--muted);font-size:10px">('+u.s+')</span></div>'
+        +'<div class="util-sub">'+sub+'</div>'
+        +'</div></div>'
+        +'<button class="btn-blue" data-action="recibir" data-ci="'+ci+'" data-s="'+u.s+'" data-i="'+u.i+'">✅ Recibida</button>'
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=algo?html:'<div class="empty"><div class="ico">🎉</div>¡No hay figuritas útiles!<p>Las cuentas secundarias no tienen nada que a tu álbum le falte.</p></div>';
+}
+function intercambiar(ci,s,i){
+  datos.principal[s][i]=true; datos.secundarias[ci].figuritas[s][i]=false; guardar(); renderUtiles();
+  if(tabActivo==="album"){var id=sid("P",s);var btn=document.querySelector('[data-grid="'+id+'"] [data-s="'+s+'"][data-i="'+i+'"]');if(btn) btn.classList.add("got");updateBadge(s,datos.principal,id);}
+  renderProgress();
+}
+function intercambiarTodo(ci){
+  if(!confirm('¿Recibir TODAS las figuritas útiles de "'+datos.secundarias[ci].nombre+'"?')) return;
+  SECS.forEach(function(s){for(var i=0;i<configuracionAlbum[s];i++) if(!datos.principal[s][i]&&datos.secundarias[ci].figuritas[s][i]){datos.principal[s][i]=true;datos.secundarias[ci].figuritas[s][i]=false;}});
+  guardar(); renderUtiles(); if(tabActivo==="album") renderAlbum(); renderProgress();
+}
+
+// ── EVENT DELEGATION ──
+document.addEventListener("click",function(e){
+  var el;
+  // chips álbum
+  el=e.target.closest(".chip[data-filtro]");
+  if(el&&el.closest("#chips")){
+    var v=el.dataset.filtro;
+    filtro=v===""?null:v; renderAlbum(); return;
+  }
+  // chips modal
+  el=e.target.closest(".chip[data-mfiltro]");
+  if(el&&el.closest("#modalInner")){
+    var mv=el.dataset.mfiltro; modalFiltro=mv===""?null:mv; renderModal(); return;
+  }
+  // toggle sección
+  el=e.target.closest('.sec-head[data-action="toggle"]');
+  if(el){toggleSec(el.dataset.s,el.dataset.prefix);return;}
+  // marcar todo álbum
+  el=e.target.closest('[data-action="marktodo"]');
+  if(el){marcarTodo(el.dataset.s,el.dataset.val==="1");return;}
+  // marcar todo sección modal
+  el=e.target.closest('[data-action="mallsec"]');
+  if(el){marcarTodoModal(el.dataset.s,el.dataset.val==="1");return;}
+  // marcar todo cuenta completa
+  el=e.target.closest('[data-action="mallacct"]');
+  if(el){marcarTodoAcct(parseInt(el.dataset.ci),el.dataset.val==="1");return;}
+  // sticker
+  el=e.target.closest('.stk[data-action="stk"]');
+  if(el){toggleStk(el.dataset.s,parseInt(el.dataset.i),el.dataset.prefix);return;}
+  // útiles: recibir una
+  el=e.target.closest('[data-action="recibir"]');
+  if(el){intercambiar(parseInt(el.dataset.ci),el.dataset.s,parseInt(el.dataset.i));return;}
+  // útiles: recibir todas
+  el=e.target.closest('[data-action="recibirtodo"]');
+  if(el){intercambiarTodo(parseInt(el.dataset.ci));return;}
+  // editar cuenta
+  el=e.target.closest('[data-action="editacct"]');
+  if(el){abrirModal(parseInt(el.dataset.ci));return;}
+  // eliminar cuenta
+  el=e.target.closest('[data-action="delacct"]');
+  if(el){eliminarAcct(parseInt(el.dataset.ci));return;}
+  // cerrar modal
+  if(e.target===$("modalBg")||e.target===$("modalCloseBtn")) closeModal();
+});
+
+// ── TABS ──
+var tabActivo="album";
+document.querySelectorAll(".tab[data-tab]").forEach(function(tab){
+  tab.addEventListener("click",function(){
+    tabActivo=tab.dataset.tab;
+    document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+    document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+    tab.classList.add("active");
+    $("view-"+tabActivo).classList.add("active");
+    if(tabActivo==="album")       renderAlbum();
+    if(tabActivo==="secundarias") renderSecundarias();
+    if(tabActivo==="utiles")      renderUtiles();
+  });
+});
+
+// ── INIT ──
+renderAlbum();
+renderProgress();
+</script>
+</body>
+</html>
